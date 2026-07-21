@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>DOCE ROUNDS — Gimnasio de box · Tu primer round es gratis</title>
+<meta name="description" content="DOCE ROUNDS, gimnasio de box. Clases por rounds, costales, sparring técnico y una esquina que no te deja caer. Tu primer round es gratis.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0A'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23E3001B' stroke-width='4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://images.pexels.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,600;10..72,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600;700&family=Roboto+Mono:wght@400;600&family=Archivo:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --tinta:#0A0A0A;
+    --papel:#E8E4DC;
+    --sangre:#E3001B;
+    --display:"Big Shoulders","Anton",sans-serif;
+    --labels:"Oswald",sans-serif;
+    --mono:"Roboto Mono",monospace;
+    --body:"Archivo",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{background:var(--tinta);overflow-x:clip;scrollbar-width:none}
+  html::-webkit-scrollbar{display:none}
+  body{
+    background:var(--tinta);color:var(--papel);
+    font-family:var(--body);font-size:1.0625rem;line-height:1.6;
+    overflow-x:clip;
+  }
+  ::selection{background:var(--sangre);color:var(--papel)}
+  img{max-width:100%;display:block}
+  section{position:relative}
+
+  /* ============ CAPAS FIJAS: grano, scanlines, flashes, CCTV ============ */
+  #grain{
+    position:fixed;top:-60px;left:-60px;width:calc(100% + 120px);height:calc(100% + 120px);
+    z-index:90;pointer-events:none;opacity:.09;
+    background-repeat:repeat;mix-blend-mode:overlay;will-change:transform;
+  }
+  #scanlines{
+    position:fixed;inset:0;z-index:88;pointer-events:none;opacity:.5;
+    background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(0,0,0,.16) 2px 3px);
+  }
+  #flash,#flash-red{
+    position:fixed;inset:0;z-index:95;pointer-events:none;opacity:0;
+  }
+  #flash{background:#FFF}
+  #flash-red{background:var(--sangre)}
+  #cctv{
+    position:fixed;top:0;right:0;z-index:92;pointer-events:none;
+    padding:max(14px, env(safe-area-inset-top, 0px)) max(18px, env(safe-area-inset-right, 0px)) 0 0;
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+    color:rgba(232,228,220,.85);text-align:right;line-height:1.8;
+    text-shadow:0 1px 2px rgba(0,0,0,.9);
+  }
+  #cctv .rec{color:var(--sangre);animation:recblink 1.1s steps(1) infinite}
+  @keyframes recblink{50%{opacity:.1}}
+  @media (max-width:799px){ #cctv{font-size:9.5px} }
+
+  /* ============ UTILERÍA ============ */
+  .foto{position:absolute;inset:0;overflow:hidden}
+  .foto img{
+    width:100%;height:100%;object-fit:cover;
+    filter:grayscale(1) contrast(1.3) brightness(.88);
+    will-change:transform;
+  }
+  .foto::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(to bottom,rgba(10,10,10,.5),rgba(10,10,10,.15) 40%,rgba(10,10,10,.72) 100%);
+  }
+  .duotono::before{
+    content:"";position:absolute;inset:0;z-index:2;
+    background:var(--sangre);mix-blend-mode:multiply;opacity:.55;
+  }
+  .tape{
+    display:inline-block;background:var(--sangre);color:var(--papel);
+    font-family:var(--labels);font-weight:700;text-transform:uppercase;
+    font-size:clamp(.75rem,1.4vw,1rem);letter-spacing:.18em;text-indent:.18em;
+    padding:.55em 1.2em;transform:rotate(-2.5deg);
+  }
+  .eyebrow{
+    font-family:var(--mono);font-size:clamp(.65rem,1.1vw,.8rem);
+    letter-spacing:.35em;text-transform:uppercase;color:rgba(232,228,220,.65);
+  }
+  .titulo{
+    font-family:var(--display);font-weight:900;text-transform:uppercase;
+    line-height:.88;letter-spacing:.01em;
+  }
+  .outline{color:transparent;-webkit-text-stroke:3px var(--papel)}
+  .ch{display:inline-block;will-change:transform}
+  .round-stamp{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:20;pointer-events:none;opacity:0;
+    font-family:var(--display);font-weight:900;text-transform:uppercase;
+    font-size:clamp(3.5rem,14vw,11rem);line-height:1;color:var(--sangre);
+    -webkit-text-stroke:2px var(--sangre);
+    text-shadow:0 0 40px rgba(227,0,27,.45);white-space:nowrap;
+  }
+  .waves{position:absolute;top:50%;left:50%;z-index:19;pointer-events:none}
+  .waves span{
+    position:absolute;top:0;left:0;width:70px;height:70px;border-radius:50%;
+    border:3px solid var(--sangre);transform:translate(-50%,-50%) scale(0);opacity:0;
+  }
+
+  /* marco de cuerdas del ring */
+  .cuerdas{
+    border:2px solid rgba(232,228,220,.85);position:relative;
+  }
+  .cuerdas::before,.cuerdas::after{
+    content:"";position:absolute;width:12px;height:12px;background:var(--sangre);
+  }
+  .cuerdas::before{top:-7px;left:-7px}
+  .cuerdas::after{bottom:-7px;right:-7px}
+
+  /* ============ MARQUEES ============ */
+  .marquee{
+    overflow:hidden;white-space:nowrap;position:relative;z-index:5;
+    background:var(--sangre);color:var(--papel);
+    border-top:3px solid var(--tinta);border-bottom:3px solid var(--tinta);
+    padding:12px 0;transform:skewY(-1.6deg) scale(1.03);
+  }
+  .marquee .track{
+    display:inline-flex;gap:2.4rem;width:max-content;padding-right:2.4rem;
+    font-family:var(--labels);font-weight:700;text-transform:uppercase;
+    font-size:clamp(1.05rem,2.4vw,1.7rem);letter-spacing:.12em;
+    animation:marquee 16s linear infinite;align-items:center;
+  }
+  .marquee .track i{font-style:normal;font-family:var(--mono);font-size:.75em;opacity:.85}
+  @keyframes marquee{to{transform:translateX(-50%)}}
+  .marquee.papel{background:var(--papel);color:var(--tinta)}
+
+  /* ============ APERTURA ============ */
+  #apertura{
+    min-height:100vh;min-height:100svh;
+    display:grid;place-items:center;overflow:hidden;text-align:center;
+    padding:14vh 5vw;
+  }
+  #apertura-inner{position:relative;z-index:5}
+  #apertura .eyebrow{display:block;margin-bottom:2.5vh}
+  #apertura h1{font-size:clamp(4.6rem,21vw,19rem)}
+  #apertura h1 .fila{display:block;overflow:hidden}
+  #apertura .tape{margin-top:3.5vh}
+  #apertura-pie{
+    position:absolute;bottom:5vh;left:0;width:100%;text-align:center;z-index:5;
+    font-family:var(--mono);font-size:clamp(.65rem,1.1vw,.8rem);letter-spacing:.3em;
+    color:rgba(232,228,220,.6);
+  }
+
+  /* ============ ROUNDS full-bleed ============ */
+  .round{
+    min-height:100vh;min-height:100svh;overflow:hidden;
+    display:grid;place-items:center;text-align:center;padding:16vh 5vw;
+  }
+  .round .palabra{
+    position:relative;z-index:5;
+    font-size:clamp(5rem,22vw,20rem);
+  }
+  .round .pie{
+    position:absolute;bottom:7vh;left:0;width:100%;z-index:5;
+    font-family:var(--labels);font-weight:600;text-transform:uppercase;
+    font-size:clamp(.8rem,1.6vw,1.15rem);letter-spacing:.25em;
+    text-shadow:0 2px 8px rgba(0,0,0,.9);padding:0 6vw;
+  }
+  .speedlines{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+  .speedlines b{
+    position:absolute;left:-20%;width:140%;height:3px;background:var(--papel);
+    transform:skewX(-30deg) translateX(-160%);opacity:0;
+  }
+
+  /* round 2: wipe */
+  #round2 .foto{clip-path:polygon(0 0, 18% 0, 0 18%, 0 0)}
+  #round2 h2{
+    position:relative;z-index:5;font-size:clamp(2.6rem,8.5vw,7.5rem);
+    text-shadow:0 3px 14px rgba(0,0,0,.85);
+  }
+
+  /* round 3: stats */
+  #round3{padding:16vh 6vw}
+  #round3 .stats-box{
+    position:relative;z-index:5;max-width:900px;margin:0 auto;
+    padding:clamp(28px,5vw,64px);background:rgba(10,10,10,.55);
+  }
+  #timer{
+    font-family:var(--mono);font-weight:600;
+    font-size:clamp(4rem,15vw,11rem);line-height:1;color:var(--sangre);
+    text-shadow:0 0 14px rgba(227,0,27,.8),0 0 50px rgba(227,0,27,.35);
+    font-variant-numeric:tabular-nums;
+  }
+  #timer-label{margin-top:6px}
+  .stats-fila{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(20px,5vw,64px);
+    margin-top:clamp(26px,4vh,44px);
+  }
+  .stat{min-width:120px}
+  .stat .num{
+    font-family:var(--display);font-weight:900;line-height:1;
+    font-size:clamp(2.6rem,6.5vw,5rem);color:var(--papel);
+    font-variant-numeric:tabular-nums;
+  }
+  .stat .lbl{
+    font-family:var(--labels);font-weight:600;text-transform:uppercase;
+    font-size:clamp(.68rem,1.1vw,.85rem);letter-spacing:.22em;margin-top:6px;
+    color:rgba(232,228,220,.75);
+  }
+
+  /* ============ LA ESQUINA (coaches) ============ */
+  #esquina{padding:16vh 6vw 12vh;text-align:center}
+  #esquina .titulo{font-size:clamp(3rem,10vw,8.5rem)}
+  #esquina .sub{margin-top:1.5vh;color:rgba(232,228,220,.7)}
+  #coaches{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(16px,3vw,40px);max-width:1150px;margin:7vh auto 0;
+  }
+  @media (max-width:799px){ #coaches{grid-template-columns:1fr;max-width:420px} }
+  .coach{position:relative;text-align:left}
+  .coach .ph{aspect-ratio:3/4;overflow:hidden;border:2px solid rgba(232,228,220,.3)}
+  .coach .ph img{
+    width:100%;height:100%;object-fit:cover;
+    filter:grayscale(1) contrast(1.3) brightness(.9);
+  }
+  .coach .tape{position:absolute;top:12px;left:-8px;font-size:.8rem}
+  .coach .nombre{
+    font-family:var(--display);font-weight:900;text-transform:uppercase;
+    font-size:clamp(1.6rem,2.6vw,2.3rem);margin-top:14px;line-height:1;
+  }
+  .coach .rol{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.25em;
+    text-transform:uppercase;color:var(--sangre);margin-top:6px;
+  }
+
+  /* ============ DESCANSO ============ */
+  #descanso{
+    min-height:90vh;min-height:90svh;overflow:hidden;
+    display:grid;place-items:center;text-align:center;padding:18vh 8vw;
+  }
+  #descanso blockquote{position:relative;z-index:5;max-width:22ch}
+  #descanso p{
+    font-family:var(--body);font-style:italic;
+    font-size:clamp(1.5rem,3.6vw,2.8rem);line-height:1.35;
+    text-shadow:0 2px 12px rgba(0,0,0,.9);
+  }
+  #descanso cite{
+    display:block;margin-top:3vh;font-style:normal;
+    font-family:var(--mono);font-size:.75rem;letter-spacing:.3em;
+    text-transform:uppercase;color:rgba(232,228,220,.6);
+  }
+
+  /* ============ CARTELERA ============ */
+  #cartelera{padding:16vh 6vw;text-align:center}
+  #cartelera .titulo{font-size:clamp(3rem,10vw,8.5rem)}
+  #planes{max-width:900px;margin:7vh auto 0;text-align:left}
+  .plan{
+    display:flex;align-items:baseline;justify-content:space-between;gap:18px;
+    padding:clamp(20px,3.5vh,34px) clamp(6px,2vw,20px);
+    border-bottom:2px solid rgba(232,228,220,.25);position:relative;
+    flex-wrap:wrap;
+  }
+  .plan:first-child{border-top:2px solid rgba(232,228,220,.25)}
+  .plan .nombre{
+    font-family:var(--display);font-weight:900;text-transform:uppercase;
+    font-size:clamp(1.7rem,4.5vw,3.4rem);line-height:1;
+  }
+  .plan .detalle{
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;
+    text-transform:uppercase;color:rgba(232,228,220,.55);margin-top:8px;
+  }
+  .plan .precio{
+    font-family:var(--display);font-weight:900;
+    font-size:clamp(1.9rem,5vw,3.8rem);line-height:1;color:var(--sangre);
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .plan .tape{position:absolute;top:-14px;right:8px;font-size:.72rem}
+
+  /* ============ CIERRE ============ */
+  #cierre{
+    min-height:100vh;min-height:100svh;display:grid;place-items:center;
+    text-align:center;padding:16vh 6vw;overflow:hidden;
+  }
+  #cierre h2{font-size:clamp(2.8rem,9.5vw,8.5rem);max-width:12ch;margin:0 auto}
+  #cierre h2 em{font-style:normal;color:var(--sangre)}
+  #cta{
+    display:inline-block;margin-top:6vh;
+    font-family:var(--labels);font-weight:700;text-transform:uppercase;
+    font-size:clamp(1rem,2vw,1.4rem);letter-spacing:.2em;text-indent:.2em;
+    color:var(--papel);background:var(--sangre);text-decoration:none;
+    padding:20px 54px;border:3px solid var(--sangre);
+    min-height:44px;min-width:44px;
+  }
+  @media (hover:hover) and (pointer:fine){
+    #cta:hover{background:var(--tinta);color:var(--papel)}
+  }
+  #cta:focus-visible{outline:3px solid var(--papel);outline-offset:4px}
+  #cierre-datos{
+    margin-top:5vh;font-family:var(--mono);
+    font-size:clamp(.65rem,1.1vw,.8rem);letter-spacing:.28em;text-transform:uppercase;
+    color:rgba(232,228,220,.6);
+  }
+  .marquee.final{padding-bottom:calc(12px + env(safe-area-inset-bottom, 0px))}
+
+  /* ============ VIEWPORTS CORTOS ============ */
+  @media (max-height:500px){
+    #apertura,.round,#descanso,#cierre{min-height:auto;padding-top:12vh;padding-bottom:12vh}
+  }
+
+  /* ============ REDUCED MOTION — versión estática ============ */
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+  body.rm #round2 .foto{clip-path:none}
+  body.rm .round-stamp,body.rm .waves,body.rm .speedlines{display:none}
+  body.rm #flash,body.rm #flash-red{display:none}
+</style>
+</head>
+<body>
+
+<div id="grain" aria-hidden="true"></div>
+<div id="scanlines" aria-hidden="true"></div>
+<div id="flash" aria-hidden="true"></div>
+<div id="flash-red" aria-hidden="true"></div>
+<div id="cctv" aria-hidden="true">
+  <div>CAM 01 · ZONA DE COSTALES</div>
+  <div><span class="rec">●</span> REC <span id="cctv-time">00:00:00</span></div>
+</div>
+
+<main id="montaje">
+
+  <!-- ============ APERTURA ============ -->
+  <section id="apertura" aria-label="Doce Rounds, gimnasio de box">
+    <div class="foto" id="apertura-foto">
+      <img src="https://images.pexels.com/photos/4761616/pexels-photo-4761616.jpeg?auto=compress&cs=tinysrgb&w=1600"
+           srcset="https://images.pexels.com/photos/4761616/pexels-photo-4761616.jpeg?auto=compress&cs=tinysrgb&w=480 480w,
+                   https://images.pexels.com/photos/4761616/pexels-photo-4761616.jpeg?auto=compress&cs=tinysrgb&w=800 800w,
+                   https://images.pexels.com/photos/4761616/pexels-photo-4761616.jpeg?auto=compress&cs=tinysrgb&w=1600 1600w"
+           sizes="100vw" fetchpriority="high"
+           alt="Gimnasio de box oscuro con cuerdas de ring y silueta entrenando" referrerpolicy="no-referrer">
+    </div>
+    <div id="apertura-inner">
+      <span class="eyebrow">GIMNASIO DE BOX · GUADALAJARA · DESDE EL PRIMER GOLPE</span>
+      <h1 class="titulo">
+        <span class="fila"><span class="ch fila-a">DOCE</span></span>
+        <span class="fila"><span class="ch fila-b">ROUNDS</span></span>
+      </h1>
+      <span class="tape">AQUÍ SE SUDA.</span>
+    </div>
+    <p id="apertura-pie">DESLIZA · EL MONTAJE EMPIEZA CONTIGO</p>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track"><span>SUBE.</span><i>//</i><span>GOLPEA.</span><i>//</i><span>REPITE.</span><i>//</i><span>SUBE.</span><i>//</i><span>GOLPEA.</span><i>//</i><span>REPITE.</span><i>//</i><span>SUBE.</span><i>//</i><span>GOLPEA.</span><i>//</i><span>REPITE.</span><i>//</i></div>
+  </div>
+
+  <!-- ============ ROUND 1 · EL COSTAL ============ -->
+  <section class="round" id="round1" data-campana="ROUND 1" aria-label="Round 1: el costal">
+    <div class="foto">
+      <img src="https://images.pexels.com/photos/9944899/pexels-photo-9944899.jpeg?auto=compress&cs=tinysrgb&w=1600"
+           alt="Boxeador golpeando un costal bajo luz industrial" loading="lazy" referrerpolicy="no-referrer">
+    </div>
+    <div class="speedlines" aria-hidden="true"></div>
+    <h2 class="palabra titulo outline">GOLPEA</h2>
+    <p class="pie">EL COSTAL NO SE PEGA SOLO.</p>
+    <div class="round-stamp" aria-hidden="true">ROUND 1</div>
+    <div class="waves" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============ ROUND 2 · LA GUARDIA ============ -->
+  <section class="round" id="round2" data-campana="ROUND 2" aria-label="Round 2: la guardia">
+    <div class="foto">
+      <img src="https://images.pexels.com/photos/17802683/pexels-photo-17802683.jpeg?auto=compress&cs=tinysrgb&w=1600"
+           alt="Dos boxeadores haciendo sparring a contraluz" loading="lazy" referrerpolicy="no-referrer">
+    </div>
+    <h2 class="titulo" data-split>NADIE NACE CON GUARDIA.</h2>
+    <p class="pie">SPARRING TÉCNICO · TODOS LOS NIVELES</p>
+    <div class="round-stamp" aria-hidden="true">ROUND 2</div>
+    <div class="waves" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============ ROUND 3 · TRES MINUTOS ============ -->
+  <section class="round duotono" id="round3" data-campana="ROUND 3" aria-label="Round 3: tres minutos">
+    <div class="foto">
+      <img src="https://images.pexels.com/photos/36397562/pexels-photo-36397562.jpeg?auto=compress&cs=tinysrgb&w=1600"
+           alt="Boxeadora golpeando el costal en un gimnasio oscuro" loading="lazy" referrerpolicy="no-referrer">
+    </div>
+    <div class="stats-box cuerdas">
+      <div id="timer">0:00</div>
+      <div id="timer-label" class="eyebrow">POR ROUND · LA CAMPANA NO PERDONA</div>
+      <div class="stats-fila">
+        <div class="stat"><div class="num" data-count="12">0</div><div class="lbl">Rounds por clase</div></div>
+        <div class="stat"><div class="num" data-count="6">0</div><div class="lbl">Costales por zona</div></div>
+        <div class="stat"><div class="num flicker" data-count="0">0</div><div class="lbl">Excusas</div></div>
+      </div>
+    </div>
+    <div class="round-stamp" aria-hidden="true">ROUND 3</div>
+    <div class="waves" aria-hidden="true"></div>
+  </section>
+
+  <div class="marquee papel" aria-hidden="true">
+    <div class="track"><span>TRES MINUTOS.</span><i>//</i><span>CERO EXCUSAS.</span><i>//</i><span>TRES MINUTOS.</span><i>//</i><span>CERO EXCUSAS.</span><i>//</i><span>TRES MINUTOS.</span><i>//</i><span>CERO EXCUSAS.</span><i>//</i></div>
+  </div>
+
+  <!-- ============ LA ESQUINA ============ -->
+  <section id="esquina" aria-label="La esquina: coaches">
+    <h2 class="titulo">LA ESQUINA</h2>
+    <p class="sub">Tres coaches. Cero palmaditas. Toda la técnica.</p>
+    <div id="coaches">
+      <article class="coach">
+        <div class="ph"><img src="https://images.pexels.com/photos/1608099/pexels-photo-1608099.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Coach Mara en guardia, casi en silueta" loading="lazy" referrerpolicy="no-referrer"></div>
+        <span class="tape">MARA</span>
+        <h3 class="nombre">Coach Mara</h3>
+        <p class="rol">GUARDIA · TÉCNICA · JAB</p>
+      </article>
+      <article class="coach">
+        <div class="ph"><img src="https://images.pexels.com/photos/33484151/pexels-photo-33484151.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Coach Tigre con los puños vendados en guardia" loading="lazy" referrerpolicy="no-referrer"></div>
+        <span class="tape">TIGRE</span>
+        <h3 class="nombre">Coach Tigre</h3>
+        <p class="rol">COSTAL · POTENCIA · CONDICIÓN</p>
+      </article>
+      <article class="coach">
+        <div class="ph"><img src="https://images.pexels.com/photos/2691307/pexels-photo-2691307.jpeg?auto=compress&cs=tinysrgb&w=900" alt="Coach Nacho después de entrenar, empapado en sudor" loading="lazy" referrerpolicy="no-referrer"></div>
+        <span class="tape">NACHO</span>
+        <h3 class="nombre">Coach Nacho</h3>
+        <p class="rol">SPARRING · ESTRATEGIA · RING</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ DESCANSO ============ -->
+  <section id="descanso" aria-label="Descanso">
+    <div class="foto" id="descanso-foto">
+      <img src="https://images.pexels.com/photos/8744796/pexels-photo-8744796.jpeg?auto=compress&cs=tinysrgb&w=1600"
+           alt="Ring de box vacío con luz de ventana" loading="lazy" referrerpolicy="no-referrer">
+    </div>
+    <blockquote>
+      <p>«El campeón se hace cuando nadie ve.»</p>
+      <cite>— LA ESQUINA · DESCANSO DE 60 SEGUNDOS</cite>
+    </blockquote>
+  </section>
+
+  <!-- ============ CARTELERA ============ -->
+  <section id="cartelera" data-campana="ROUND FINAL" aria-label="Cartelera de planes">
+    <h2 class="titulo">CARTELERA</h2>
+    <div id="planes">
+      <div class="plan">
+        <div><div class="nombre">Por visita</div><div class="detalle">UN DÍA · GUANTES INCLUIDOS</div></div>
+        <div class="precio" data-precio="80">$0</div>
+      </div>
+      <div class="plan">
+        <span class="tape">EL FAVORITO</span>
+        <div><div class="nombre">Mensual</div><div class="detalle">CLASES ILIMITADAS · TODAS LAS ZONAS</div></div>
+        <div class="precio" data-precio="649">$0</div>
+      </div>
+      <div class="plan">
+        <div><div class="nombre">Doce Rounds</div><div class="detalle">PROGRAMA DE 12 SEMANAS · ESQUINA PERSONAL</div></div>
+        <div class="precio" data-precio="1690">$0</div>
+      </div>
+    </div>
+    <div class="round-stamp" aria-hidden="true">ROUND FINAL</div>
+    <div class="waves" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============ CIERRE ============ -->
+  <section id="cierre" aria-label="Reserva tu primer round">
+    <div>
+      <h2 class="titulo">TU PRIMER ROUND ES <em>GRATIS.</em></h2>
+      <a id="cta" href="#reserva">SUBE AL RING</a>
+      <p id="cierre-datos">LUN – SÁB · 6:00 – 22:00 · AV. DEL SUDOR 12 · GDL</p>
+    </div>
+  </section>
+
+</main>
+
+<div class="marquee final" aria-hidden="true">
+  <div class="track"><span>NOS VEMOS EN EL RING</span><i>//</i><span>DOCE ROUNDS</span><i>//</i><span>NOS VEMOS EN EL RING</span><i>//</i><span>DOCE ROUNDS</span><i>//</i><span>NOS VEMOS EN EL RING</span><i>//</i><span>DOCE ROUNDS</span><i>//</i></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var MOBILE = window.matchMedia("(max-width: 799px)").matches;
+
+  /* ---- grano (tile canvas, nunca filtro full-screen) ---- */
+  (function buildGrain(){
+    var c = document.createElement("canvas");
+    c.width = c.height = 160;
+    var g = c.getContext("2d");
+    var img = g.createImageData(160,160);
+    for (var i=0;i<img.data.length;i+=4){
+      var v = (Math.random()*255)|0;
+      img.data[i]=img.data[i+1]=img.data[i+2]=v; img.data[i+3]=255;
+    }
+    g.putImageData(img,0,0);
+    document.getElementById("grain").style.backgroundImage = "url(" + c.toDataURL() + ")";
+  })();
+
+  /* ---- CCTV timestamp vivo ---- */
+  (function(){
+    var el = document.getElementById("cctv-time");
+    function tick(){
+      var d = new Date();
+      el.textContent = [d.getHours(),d.getMinutes(),d.getSeconds()]
+        .map(function(n){ return String(n).padStart(2,"0"); }).join(":");
+    }
+    tick(); setInterval(tick, 1000);
+  })();
+
+  /* ---- srcset responsivo para fotos lazy de Pexels ---- */
+  document.querySelectorAll('img[loading="lazy"][src*="images.pexels.com"]').forEach(function(img){
+    if (img.srcset) return;
+    img.srcset = [480,800,1200,1600].map(function(w){
+      return img.src.replace(/([?&])w=\d+/, "$1w=" + w) + " " + w + "w";
+    }).join(", ");
+    img.sizes = img.closest(".coach") ? "(max-width: 799px) 90vw, 30vw" : "100vw";
+  });
+
+  /* ---- split por caracteres (sin innerHTML) ---- */
+  document.querySelectorAll("[data-split]").forEach(function(el){
+    var text = el.textContent;
+    el.setAttribute("aria-label", text);
+    el.textContent = "";
+    text.split("").forEach(function(c){
+      var s = document.createElement("span");
+      s.className = "ch";
+      s.setAttribute("aria-hidden","true");
+      s.textContent = c === " " ? " " : c;
+      el.appendChild(s);
+    });
+  });
+
+  /* ---- speed lines + ondas de campana (DOM procedural) ---- */
+  document.querySelectorAll(".speedlines").forEach(function(box){
+    for (var i=0;i<7;i++){
+      var b = document.createElement("b");
+      b.style.top = (8 + Math.random()*84) + "%";
+      b.style.height = (2 + Math.random()*4) + "px";
+      box.appendChild(b);
+    }
+  });
+  document.querySelectorAll(".waves").forEach(function(box){
+    for (var i=0;i<3;i++) box.appendChild(document.createElement("span"));
+  });
+
+  if (REDUCED){
+    document.body.classList.add("rm");
+    document.getElementById("timer").textContent = "3:00";
+    document.querySelectorAll("[data-count]").forEach(function(el){ el.textContent = el.dataset.count; });
+    document.querySelectorAll("[data-precio]").forEach(function(el){
+      el.textContent = "$" + (+el.dataset.precio).toLocaleString("en-US");
+    });
+    return;
+  }
+
+  /* ============ MOTOR: Lenis + ScrollTrigger (un solo RAF) ============ */
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  var lenis = new Lenis({ autoRaf: false, lerp: .1, syncTouch: false });
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add(function(t){ lenis.raf(t * 1000); });
+  gsap.ticker.lagSmoothing(0);
+  var mm = gsap.matchMedia();
+
+  /* ============ CORTE DE IMPACTO ============ */
+  var flash = document.getElementById("flash");
+  var flashRed = document.getElementById("flash-red");
+  function impact(intensity, red){
+    var f = red ? flashRed : flash;
+    gsap.fromTo(f, {opacity: red ? .55 : .85}, {opacity: 0, duration: .2, ease: "power4.out"});
+    var k = (MOBILE ? .5 : 1) * intensity;
+    gsap.fromTo("#montaje", {x:0, y:0}, {
+      x: function(){ return gsap.utils.random(-8,8) * k; },
+      y: function(){ return gsap.utils.random(-6,6) * k; },
+      duration: .05, repeat: 5, yoyo: true, ease: "none", clearProps: "x,y"
+    });
+  }
+
+  /* ============ CAMPANA por round (onEnter, una vez) ============ */
+  document.querySelectorAll("[data-campana]").forEach(function(sec){
+    var stamp = sec.querySelector(".round-stamp");
+    var waves = sec.querySelectorAll(".waves span");
+    stamp.textContent = sec.dataset.campana;
+    ScrollTrigger.create({
+      trigger: sec, start: "top 62%", once: true,
+      onEnter: function(){
+        impact(1, true);
+        gsap.fromTo(stamp,
+          { opacity: 1, scale: 2.1, rotation: gsap.utils.random(-6,6) },
+          { scale: 1, rotation: 0, duration: .4, ease: "back.out(2.5)" });
+        gsap.to(stamp, { opacity: 0, duration: .45, ease: "power2.in", delay: .75 });
+        gsap.fromTo(waves,
+          { scale: 0, opacity: 1 },
+          { scale: 9, opacity: 0, duration: .9, stagger: .09, ease: "power2.out",
+            transformOrigin: "center center" });
+        var lines = sec.querySelectorAll(".speedlines b");
+        if (lines.length){
+          gsap.fromTo(lines,
+            { xPercent: -160, opacity: 1 },
+            { xPercent: 160, opacity: 0, duration: .5, stagger: .04, ease: "power4.in" });
+        }
+      }
+    });
+  });
+
+  /* ============ APERTURA ============ */
+  gsap.timeline()
+    .from("#apertura .eyebrow", { opacity: 0, y: -20, duration: .5, ease: "power2.out" }, .2)
+    .from(".fila-a", { yPercent: 115, duration: .7, ease: "power3.out" }, .35)
+    .from(".fila-b", { yPercent: 115, duration: .7, ease: "power3.out" }, .48)
+    .from("#apertura .tape", { scale: 2.2, opacity: 0, rotation: -9, duration: .45, ease: "back.out(2.5)",
+        onComplete: function(){ impact(.5, false); } }, 1.0)
+    .from("#apertura-pie", { opacity: 0, duration: .5 }, 1.4);
+
+  /* punch-in del hero: pinned en desktop alto, Ken Burns simple en el resto */
+  mm.add("(min-width: 800px) and (min-height: 501px)", function(){
+    gsap.timeline({
+      scrollTrigger: { trigger: "#apertura", start: "top top", end: "+=120%",
+        scrub: 1, pin: true, anticipatePin: 1, invalidateOnRefresh: true }
+    })
+      .fromTo("#apertura-foto img", { scale: 1 }, { scale: 1.45, ease: "none" }, 0)
+      .to("#apertura-inner", { scale: 1.12, ease: "none" }, 0)
+      .to("#apertura-inner, #apertura-pie", { opacity: 0, ease: "none", duration: .25 }, .75);
+  });
+  mm.add("(max-width: 799px), (max-height: 500px)", function(){
+    gsap.fromTo("#apertura-foto img", { scale: 1.25 }, { scale: 1, ease: "none",
+      scrollTrigger: { trigger: "#apertura", start: "top top", end: "bottom top", scrub: true } });
+  });
+
+  /* ============ KEN BURNS en rounds full-bleed ============ */
+  [["#round1", 1.28], ["#round3", 1.2], ["#descanso", 1.18]].forEach(function(pair){
+    gsap.fromTo(pair[0] + " .foto img", { scale: pair[1] }, { scale: 1, ease: "none",
+      scrollTrigger: { trigger: pair[0], start: "top bottom", end: "bottom top", scrub: true } });
+  });
+  gsap.fromTo("#round1 .palabra", { scale: .72, opacity: 0 }, { scale: 1, opacity: 1, ease: "none",
+    scrollTrigger: { trigger: "#round1", start: "top 75%", end: "top 15%", scrub: true } });
+
+  /* ============ ROUND 2: wipe diagonal + chars sello ============ */
+  gsap.fromTo("#round2 .foto",
+    { clipPath: "polygon(0 0, 18% 0, 0 18%, 0 0)" },
+    { clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)", ease: "none",
+      scrollTrigger: { trigger: "#round2", start: "top 85%", end: "top 12%", scrub: true } });
+  ScrollTrigger.create({
+    trigger: "#round2", start: "top 45%", once: true,
+    onEnter: function(){
+      gsap.from("#round2 .ch", { y: -70, rotation: -12, opacity: 0,
+        duration: .5, stagger: .035, ease: "back.out(1.6)" });
+    }
+  });
+
+  /* ============ ROUND 3: timer + count-ups + flicker ============ */
+  ScrollTrigger.create({
+    trigger: "#round3", start: "top 55%", once: true,
+    onEnter: function(){
+      var timer = document.getElementById("timer");
+      var t = { s: 0 };
+      gsap.to(t, { s: 180, duration: 2.2, ease: "power1.inOut", onUpdate: function(){
+        var s = Math.round(t.s);
+        timer.textContent = Math.floor(s/60) + ":" + String(s%60).padStart(2,"0");
+      }});
+      document.querySelectorAll("#round3 [data-count]").forEach(function(el){
+        var target = +el.dataset.count;
+        var o = { v: 0 };
+        gsap.to(o, { v: target, duration: 1.8, ease: "power1.inOut",
+          onUpdate: function(){ el.textContent = Math.round(o.v); } });
+      });
+      gsap.to("#round3 .flicker", { opacity: .15, duration: .07, repeat: 9, yoyo: true,
+        ease: "steps(1)", delay: 1.9 });
+    }
+  });
+
+  /* ============ LA ESQUINA: entradas sello ============ */
+  ScrollTrigger.batch(".coach", {
+    start: "top 82%", once: true,
+    onEnter: function(batch){
+      gsap.from(batch, { scale: 1.6, opacity: 0,
+        rotation: function(){ return gsap.utils.random(-5,5); },
+        duration: .45, stagger: .12, ease: "back.out(2.2)",
+        onComplete: function(){ impact(.35, false); } });
+    }
+  });
+  gsap.from("#esquina .titulo", { yPercent: 40, opacity: 0, duration: .6, ease: "power3.out",
+    scrollTrigger: { trigger: "#esquina", start: "top 70%", once: true } });
+
+  /* ============ DESCANSO: valle de ritmo ============ */
+  gsap.from("#descanso blockquote", { opacity: 0, y: 34, duration: 1.1, ease: "power2.out",
+    scrollTrigger: { trigger: "#descanso", start: "top 60%", once: true } });
+
+  /* ============ CARTELERA: precios count-up ============ */
+  ScrollTrigger.create({
+    trigger: "#planes", start: "top 75%", once: true,
+    onEnter: function(){
+      document.querySelectorAll("[data-precio]").forEach(function(el, i){
+        var target = +el.dataset.precio;
+        var o = { v: 0 };
+        gsap.to(o, { v: target, duration: 1.4, delay: i * .18, ease: "power2.out",
+          onUpdate: function(){ el.textContent = "$" + Math.round(o.v).toLocaleString("en-US"); } });
+      });
+      gsap.from(".plan", { x: -40, opacity: 0, duration: .5, stagger: .14, ease: "power3.out" });
+    }
+  });
+
+  /* ============ CIERRE ============ */
+  ScrollTrigger.create({
+    trigger: "#cierre", start: "top 60%", once: true,
+    onEnter: function(){
+      impact(.7, true);
+      gsap.from("#cierre h2", { scale: 1.5, opacity: 0, duration: .5, ease: "back.out(2)" });
+      gsap.from("#cta, #cierre-datos", { y: 30, opacity: 0, duration: .5, stagger: .12,
+        ease: "power3.out", delay: .25 });
+    }
+  });
+  gsap.to("#cta", { scale: 1.05, duration: .9, repeat: -1, yoyo: true, ease: "power1.inOut" });
+
+  /* ============ MARQUEES: velocidad reactiva al scroll ============ */
+  var marqueeTweens = [];
+  document.querySelectorAll(".marquee .track").forEach(function(track){
+    marqueeTweens.push(gsap.to(track, { xPercent: -50, ease: "none", duration: 16, repeat: -1 }));
+  });
+  ScrollTrigger.create({
+    onUpdate: function(self){
+      var ts = gsap.utils.clamp(-3.5, 3.5, self.getVelocity() / 350) || 1;
+      marqueeTweens.forEach(function(tw){ tw.timeScale(ts); });
+    }
+  });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      var tw = marqueeTweens[Array.prototype.indexOf.call(document.querySelectorAll(".marquee .track"), e.target)];
+      if (tw) e.isIntersecting ? tw.play() : tw.pause();
+    });
+  }, { rootMargin: "100px" });
+  document.querySelectorAll(".marquee .track").forEach(function(t){ io.observe(t); });
+
+  window.addEventListener("load", function(){ ScrollTrigger.refresh(); });
+})();
+</script>
+</body>
+</html>
